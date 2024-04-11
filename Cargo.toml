@@ -1,0 +1,11 @@
+[package]
+name = "rewordapp2anki"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+anyhow = "1.0.82"
+genanki-rs = { path = "../../github/genanki-rs" }
+inquire = "0.7.4"
+rusqlite = { version = "0.25.1", features = ["modern_sqlite"] }
