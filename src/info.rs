@@ -41,8 +41,11 @@ pub enum Language {
 
 #[derive(Debug, Clone)]
 pub struct TrInfo {
+    /// Reword's app kind
     pub app: App,
+    /// App's target language
     pub learn_lang: Language,
+    /// Translation (native) language
     pub tr_lang: Language,
 }
 
@@ -105,12 +108,6 @@ impl Display for App {
     }
 }
 
-impl Display for Language {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.pad(&self.display())
-    }
-}
-
 impl Language {
     pub fn kind(&self) -> String {
         let s = match self {
@@ -151,6 +148,12 @@ impl Language {
             Self::Turkish => "Turkish",
         };
         s.to_owned()
+    }
+}
+
+impl Display for Language {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.pad(&self.display())
     }
 }
 

@@ -4,7 +4,7 @@ use anyhow::Result;
 use rusqlite::Connection;
 
 use crate::{
-    info::TrInfo,
+    info::{Language, TrInfo},
     query::{app_query_map, app_sql},
 };
 
@@ -19,20 +19,19 @@ impl DB {
             conn: Connection::open(file)?,
         })
     }
-    /*pub fn list_categories(&self) -> Result<Vec<Category>> {
-        let mut st = self.conn.prepare(Category::LIST_SQL)?;
+    pub fn list_categories(&self, lang: Language) -> Result<Vec<Category>> {
+        let mut st = self.conn.prepare(&Category::list_sql(lang))?;
         let categories: Vec<_> = st
             .query_map([], |r| {
                 Ok(Category {
-                    id: r.get(0)?,
-                    name_eng: r.get(1)?,
-                    name_rus: r.get(2)?,
+                    id: r.get("id")?,
+                    name: r.get("name")?,
                 })
             })?
             .filter_map(|c| c.ok())
             .collect();
         Ok(categories)
-    }*/
+    }
     pub fn list_words(&self, info: TrInfo) -> Result<Vec<Word>> {
         let mut st = self.conn.prepare(&app_sql(info.clone()))?;
         let words = st
@@ -51,17 +50,25 @@ impl DB {
     }*/
 }
 
-/*#[derive(Debug)]
+#[derive(Debug)]
 pub struct Category {
     pub id: String,
-    pub name_eng: String,
-    pub name_rus: String,
+    pub name: String,
 }
 
 impl Category {
-    const LIST_SQL: &'static str =
-        "select id, name_eng, name_rus from category where is_custom = 0";
-}*/
+    const LIST_SQL: &'static str = "select id, {LANG} as name from category where is_custom = 0";
+
+    fn list_sql(lang: Language) -> String {
+        Self::LIST_SQL.replace("{LANG}", &format!("name_{}", lang.kind()))
+    }
+}
+
+impl Display for Category {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.pad(&self.name)
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct Word {
@@ -71,7 +78,7 @@ pub struct Word {
     pub picture: Option<Picture>,
     pub reading: Option<String>,
     pub translate: Option<String>,
-    pub category_id: Vec<String>,
+    pub category_ids: Vec<String>,
 }
 
 /// Merge multiple equal words with categories to one word
@@ -79,7 +86,7 @@ fn fold_categories(words: Vec<Word>) -> Result<Vec<Word>> {
     let mut map: HashMap<i64, Word> = HashMap::with_capacity(words.len());
     for w in words {
         if let Some(e) = map.get_mut(&w.id) {
-            e.category_id.extend(w.category_id);
+            e.category_ids.extend(w.category_ids);
         } else {
             map.insert(w.id, w);
         }

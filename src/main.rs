@@ -1,4 +1,5 @@
 use std::{
+    collections::HashSet,
     io::{Cursor, Read},
     path::{Path, PathBuf},
     time::Instant,
@@ -6,8 +7,9 @@ use std::{
 
 use anyhow::{anyhow, Result};
 use clap::Parser;
+use db::Category;
 use info::App;
-use inquire::{Select, Text};
+use inquire::{Confirm, MultiSelect, Select, Text};
 use inquire_autocomplete_path::FilePathCompleter;
 use query::{app_apk_db_path, app_languages};
 use zip::ZipArchive;
@@ -42,11 +44,23 @@ fn main() -> Result<()> {
     let db = DB::new(input.db_path)?;
 
     let words = db.list_words(input.tr.clone())?;
-    println!("Words count: {}", words.len());
 
-    // let categories = db.list_categories()?;
-    // let categories: HashMap<String, &db::Category> = HashMap::from_iter(categories.iter().map(|c| (c.id.clone(), c)));
+    // select categories
+    let categories = db.list_categories(input.tr.tr_lang)?;
+    let words: Vec<_> = if let Some(categories) = ask_categories(categories)? {
+        println!("Total words count: {}", words.len());
 
+        let categories: HashSet<_> = categories.into_iter().map(|c| c.id).collect();
+        words
+            .into_iter()
+            .filter(|w| w.category_ids.iter().any(|c| categories.contains(c)))
+            .collect()
+    } else {
+        words
+    };
+    println!("Words to export: {}", words.len());
+
+    // export with timer
     let timer = Instant::now();
     let mut deck = DeckWriter::new(input.tr);
     if words.len() > APPROX_BOUND {
@@ -72,6 +86,14 @@ fn main() -> Result<()> {
     Ok(())
 }
 
+/// Ask for:
+///
+/// - App
+/// - Path to APK file (if db for this app is not cached)
+/// - Translate language
+/// - Where to save exported collection
+///
+/// If path to APK is given, extract and cache db
 fn ask(no_cache: bool) -> Result<Input> {
     let app: App = Select::new("App to import:", App::SUPPORTED.to_vec()).prompt()?;
 
@@ -106,6 +128,25 @@ fn ask(no_cache: bool) -> Result<Input> {
         db_path,
         output_path,
     })
+}
+
+fn ask_categories(categories: Vec<Category>) -> Result<Option<Vec<Category>>> {
+    if !Confirm::new("Select specific categories?")
+        .with_default(false)
+        .prompt()?
+    {
+        return Ok(None);
+    }
+
+    let total_categories = categories.len();
+    let result = MultiSelect::new("Select categories: ", categories)
+        .with_all_selected_by_default()
+        .prompt()?;
+    if total_categories == result.len() {
+        Ok(None)
+    } else {
+        Ok(Some(result))
+    }
 }
 
 fn db_cache_path(app: App) -> Result<PathBuf> {

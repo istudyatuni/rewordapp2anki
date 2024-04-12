@@ -39,7 +39,7 @@ mod func {
             picture: Picture::new(r.get("picture_source")?, r.get("picture_source_id")?),
             reading: r.get("reading")?,
             translate: r.get("translate")?,
-            category_id: vec![r.get("category_id")?],
+            category_ids: vec![r.get("category_id")?],
         })
     }
 

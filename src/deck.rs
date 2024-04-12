@@ -54,7 +54,7 @@ impl DeckWriter {
                 .map(|v| v.as_str())
                 .collect(),
             None,
-            Some(w.category_id.iter().map(|c| c.as_str()).collect()),
+            Some(w.category_ids.iter().map(|c| c.as_str()).collect()),
             Some(&format!("reword-{}-{}", self.info.app.kind(), w.id)),
         )?);
         Ok(())
