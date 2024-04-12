@@ -1,9 +1,12 @@
 use std::{collections::HashMap, fmt::Display, path::Path};
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use rusqlite::Connection;
 
-use crate::{info::App, query::app_sql};
+use crate::{
+    info::TrInfo,
+    query::{app_query_map, app_sql},
+};
 
 #[derive(Debug)]
 pub struct DB {
@@ -30,20 +33,10 @@ impl DB {
             .collect();
         Ok(categories)
     }*/
-    pub fn list_words(&self, app: App) -> Result<Vec<Word>> {
-        let mut st = self.conn.prepare(app_sql(app))?;
+    pub fn list_words(&self, info: TrInfo) -> Result<Vec<Word>> {
+        let mut st = self.conn.prepare(&app_sql(info.clone()))?;
         let words = st
-            .query_map([], |r| {
-                Ok(Word {
-                    id: r.get("id")?,
-                    word: r.get("word")?,
-                    transcription: r.get("transcription")?,
-                    picture: Picture::new(r.get("picture_source")?, r.get("picture_source_id")?),
-                    reading: r.get("reading")?,
-                    translate: r.get("translate")?,
-                    category_id: vec![r.get("category_id")?],
-                })
-            })?
+            .query_map([], app_query_map(info.app))?
             .filter_map(|c| c.ok())
             .collect::<Vec<_>>();
         fold_categories(words)

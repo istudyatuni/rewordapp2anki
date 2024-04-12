@@ -6,6 +6,9 @@ publish = false
 
 [dependencies]
 anyhow = "1.0.82"
-genanki-rs = { path = "../../github/genanki-rs" }
-inquire = "0.7.4"
+clap = { version = "4.5.4", features = ["derive"] }
+dirs = "5.0.1"
+genanki-rs = { git = "https://github.com/istudyatuni/genanki-rs.git", branch = "rusqlite-bundle" }
+inquire = { git = "https://github.com/istudyatuni/inquire.git", branch = "fix-autocomplete" }
 rusqlite = { version = "0.25.1", features = ["modern_sqlite"] }
+zip = "0.6.6"
