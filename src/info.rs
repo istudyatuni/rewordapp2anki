@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+// Order of fields are important and used for calculating Anki model's id
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy)]
 pub enum App {

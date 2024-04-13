@@ -43,12 +43,20 @@ fn main() -> Result<()> {
     let input = ask(args.no_cache)?;
     let db = DB::new(input.db_path)?;
 
+    let total_words = db.words_count()?;
     let words = db.list_words(input.tr.clone())?;
+    if total_words > words.len() {
+        println!(
+            "Not all words are available for {} language, total words in database: {}",
+            input.tr.tr_lang.display(),
+            total_words
+        )
+    }
 
     // select categories
     let categories = db.list_categories(input.tr.tr_lang)?;
     let words: Vec<_> = if let Some(categories) = ask_categories(categories)? {
-        println!("Total words count: {}", words.len());
+        println!("All words count: {}", words.len());
 
         let categories: HashSet<_> = categories.into_iter().map(|c| c.id).collect();
         words
@@ -139,7 +147,7 @@ fn ask_categories(categories: Vec<Category>) -> Result<Option<Vec<Category>>> {
     }
 
     let total_categories = categories.len();
-    let result = MultiSelect::new("Select categories: ", categories)
+    let result = MultiSelect::new("Select categories:", categories)
         .with_all_selected_by_default()
         .prompt()?;
     if total_categories == result.len() {

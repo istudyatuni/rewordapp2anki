@@ -18,6 +18,10 @@ mod func {
         }
     }
 
+    pub fn app_model_id(app: App) -> i64 {
+        10964854234530 + app as i64
+    }
+
     pub fn app_sql(info: TrInfo) -> String {
         match info.app {
             App::English => eng::words(info),
@@ -91,7 +95,8 @@ mod eng {
          join word_category wc
            on w.id = wc.word_id
          full outer join picture p
-           on p.id = w.picture_id";
+           on p.id = w.picture_id
+         where translate is not null";
 
     pub fn words(info: TrInfo) -> String {
         WORDS.replace("{LANG}", &format!("w.{}", info.tr_lang.kind()))
@@ -131,7 +136,8 @@ mod jap {
          join word_category wc
            on w.id = wc.word_id
          full outer join picture p
-           on p.id = w.picture_id";
+           on p.id = w.picture_id
+         where translate is not null";
 
     pub fn words(info: TrInfo) -> String {
         WORDS.replace("{LANG}", &format!("w.{}", info.tr_lang.kind()))
@@ -173,7 +179,8 @@ mod rus {
          join word_category wc
            on w.id = wc.word_id
          full outer join picture p
-           on p.id = w.picture_id";
+           on p.id = w.picture_id
+         where translate is not null";
 
     pub fn words(info: TrInfo) -> String {
         WORDS.replace("{LANG}", &format!("w.{}", info.tr_lang.kind()))

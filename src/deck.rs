@@ -4,7 +4,7 @@ use genanki_rs::{Deck, Field, Model, Note, Template};
 use crate::{
     db::{Picture, Word},
     info::TrInfo,
-    query::{app_anki_fields, app_anki_values},
+    query::{app_anki_fields, app_anki_values, app_model_id},
 };
 
 const CSS: &str = ".card {
@@ -13,6 +13,9 @@ const CSS: &str = ".card {
   text-align: center;
   color: black;
   background-color: white;
+}
+details {
+  text-align: left;
 }";
 
 pub struct DeckWriter {
@@ -25,23 +28,32 @@ impl DeckWriter {
     pub fn new(info: TrInfo) -> Self {
         let fields = app_anki_fields(info.app);
         let model = Model::new(
-            10964854234534,
-            "Reword",
+            app_model_id(info.app),
+            &format!("Reword {}", info.app.display()),
             fields.names().into_iter().map(|f| Field::new(f)).collect(),
-            vec![Template::new(&format!(
-                "{} - {}",
-                info.learn_lang.display(),
-                info.tr_lang.display()
-            ))
-            .qfmt(&fields.qfmt())
-            .afmt(&fields.afmt())],
+            vec![
+                Template::new(&format!(
+                    "{} - {}",
+                    info.learn_lang.display(),
+                    info.tr_lang.display(),
+                ))
+                .qfmt(&fields.qfmt())
+                .afmt(&fields.afmt()),
+                Template::new(&format!(
+                    "{} - {}",
+                    info.tr_lang.display(),
+                    info.learn_lang.display(),
+                ))
+                .qfmt(&fields.qfmt_rev())
+                .afmt(&fields.afmt_rev()),
+            ],
         )
         .css(CSS)
-        .sort_field_index(0);
+        .sort_field_index(AnkiFieldNames::sort_index());
         let deck = Deck::new(
             965781129384,
-            &format!("Reword {}", info.app.display()),
-            "test deck",
+            &format!("Reword {} - {}", info.app.display(), info.tr_lang.display()),
+            "",
         );
         Self { model, deck, info }
     }
@@ -126,6 +138,9 @@ impl AnkiFieldNames {
     fn qfmt(&self) -> String {
         Self::field(&self.word)
     }
+    fn qfmt_rev(&self) -> String {
+        Self::field(&self.translate)
+    }
     fn afmt(&self) -> String {
         let back = [
             &self.reading,
@@ -140,8 +155,25 @@ impl AnkiFieldNames {
 
         format!("{}\n<hr id=\"answer\">\n{back}", Self::field("FrontSide"))
     }
+    fn afmt_rev(&self) -> String {
+        let back = [
+            &self.word,
+            &self.reading,
+            &self.transcription,
+            // &self.picture,
+        ]
+        .iter()
+        .map(|f| Self::field(f))
+        .collect::<Vec<_>>()
+        .join("<br>\n");
+
+        format!("{}\n<hr id=\"answer\">\n{back}", Self::field("FrontSide"))
+    }
     fn field(name: &str) -> String {
         format!("{{{{{name}}}}}")
+    }
+    const fn sort_index() -> i64 {
+        0
     }
     fn names(&self) -> impl IntoIterator<Item = &String> {
         vec![
@@ -190,6 +222,7 @@ mod tests {
         };
 
         let names: Vec<_> = names.names().into_iter().collect();
+        assert_eq!(names[AnkiFieldNames::sort_index() as usize], &word);
         assert_eq!(names, expected.clone());
 
         let fields = fields.list();

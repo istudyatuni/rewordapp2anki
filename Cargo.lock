@@ -474,7 +474,7 @@ dependencies = [
 [[package]]
 name = "genanki-rs"
 version = "0.4.0"
-source = "git+https://github.com/istudyatuni/genanki-rs.git?branch=rusqlite-bundle#9143ee06e657ef0fdc5154e4abf3a61c2cd9e34a"
+source = "git+https://github.com/istudyatuni/genanki-rs.git?branch=rusqlite-bundle#b36ebe6e0737490a0e6fd6ae75bfc5609fb4d2e6"
 dependencies = [
  "fancy-regex",
  "ramhorns",
@@ -561,7 +561,7 @@ dependencies = [
 [[package]]
 name = "inquire"
 version = "0.7.4"
-source = "git+https://github.com/istudyatuni/inquire.git?branch=fix-autocomplete#43ca9d4c7b9671e74eef1a58aa7c2a2e87ab5221"
+source = "git+https://github.com/istudyatuni/inquire.git?branch=fix-autocomplete#e107f3ab820dcffb9727d2b2507cd9d9fc782ebe"
 dependencies = [
  "bitflags 2.5.0",
  "crossterm",

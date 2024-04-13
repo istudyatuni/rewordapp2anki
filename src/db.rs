@@ -26,11 +26,16 @@ impl DB {
                 Ok(Category {
                     id: r.get("id")?,
                     name: r.get("name")?,
+                    words_count: r.get("words_count")?,
                 })
             })?
             .filter_map(|c| c.ok())
             .collect();
         Ok(categories)
+    }
+    pub fn words_count(&self) -> Result<usize> {
+        let mut st = self.conn.prepare("select count(*) as count from word")?;
+        Ok(st.query_row([], |r| r.get("count"))?)
     }
     pub fn list_words(&self, info: TrInfo) -> Result<Vec<Word>> {
         let mut st = self.conn.prepare(&app_sql(info.clone()))?;
@@ -54,19 +59,30 @@ impl DB {
 pub struct Category {
     pub id: String,
     pub name: String,
+    pub words_count: i64,
 }
 
 impl Category {
-    const LIST_SQL: &'static str = "select id, {LANG} as name from category where is_custom = 0";
+    const LIST_SQL: &'static str = "select
+           c.id,
+           {LANG} as name,
+           (
+             select
+               count(*)
+               from word_category wc
+               where wc.category_id = c.id
+           ) as words_count
+         from category c
+         where c.is_custom = 0";
 
     fn list_sql(lang: Language) -> String {
-        Self::LIST_SQL.replace("{LANG}", &format!("name_{}", lang.kind()))
+        Self::LIST_SQL.replace("{LANG}", &format!("c.name_{}", lang.kind()))
     }
 }
 
 impl Display for Category {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.pad(&self.name)
+        write!(f, "{} ({} words)", self.name, self.words_count)
     }
 }
 
