@@ -2,7 +2,7 @@ use anyhow::Result;
 use genanki_rs::{Deck, Field, Model, Note, Template};
 
 use crate::{
-    db::{Picture, Word},
+    db::{Example, Picture, Word},
     info::TrInfo,
     query::{app_anki_fields, app_anki_values, app_model_id},
 };
@@ -18,6 +18,14 @@ details {
   text-align: left;
 }";
 
+const EXAMPLES_FIELD: &str = "examples";
+
+const EXAMPLES: &str = "
+{{#examples}}
+<br>Examples:
+{{examples}}
+{{/examples}}";
+
 pub struct DeckWriter {
     model: Model,
     deck: Deck,
@@ -30,7 +38,7 @@ impl DeckWriter {
         let model = Model::new(
             app_model_id(info.app),
             &format!("Reword {}", info.app.display()),
-            fields.names().into_iter().map(|f| Field::new(f)).collect(),
+            fields.names().into_iter().map(Field::new).collect(),
             vec![
                 Template::new(&format!(
                     "{} - {}",
@@ -84,6 +92,7 @@ pub struct AnkiFields {
     pub transcription: String,
     pub translate: Option<String>,
     pub picture: Option<Picture>,
+    pub examples: Option<Vec<Example>>,
 }
 
 impl AnkiFields {
@@ -97,6 +106,7 @@ impl AnkiFields {
             .clone()
             .map(|p| format!("{}:{}", p.source, p.source_id))
             .unwrap_or_default(),*/
+            examples_to_html(self.examples.as_deref()),
         ]
     }
 }
@@ -109,6 +119,7 @@ impl From<Word> for AnkiFields {
             transcription: value.transcription,
             translate: value.translate,
             picture: value.picture,
+            examples: value.examples,
         }
     }
 }
@@ -153,7 +164,10 @@ impl AnkiFieldNames {
         .collect::<Vec<_>>()
         .join("<br>\n");
 
-        format!("{}\n<hr id=\"answer\">\n{back}", Self::field("FrontSide"))
+        format!(
+            "{}\n<hr id=\"answer\">\n{back}{EXAMPLES}",
+            Self::field("FrontSide")
+        )
     }
     fn afmt_rev(&self) -> String {
         let back = [
@@ -167,7 +181,10 @@ impl AnkiFieldNames {
         .collect::<Vec<_>>()
         .join("<br>\n");
 
-        format!("{}\n<hr id=\"answer\">\n{back}", Self::field("FrontSide"))
+        format!(
+            "{}\n<hr id=\"answer\">\n{back}{EXAMPLES}",
+            Self::field("FrontSide")
+        )
     }
     fn field(name: &str) -> String {
         format!("{{{{{name}}}}}")
@@ -175,15 +192,35 @@ impl AnkiFieldNames {
     const fn sort_index() -> i64 {
         0
     }
-    fn names(&self) -> impl IntoIterator<Item = &String> {
+    fn names(&self) -> impl IntoIterator<Item = &str> {
         vec![
-            &self.word,
-            &self.reading,
-            &self.translate,
-            &self.transcription,
+            self.word.as_str(),
+            self.reading.as_str(),
+            self.translate.as_str(),
+            self.transcription.as_str(),
             // &self.picture,
+            EXAMPLES_FIELD,
         ]
     }
+}
+
+fn examples_to_html(examples: Option<&[Example]>) -> String {
+    let Some(examples) = examples else {
+        // todo: do not use cfg
+        #[cfg(not(test))]
+        return "".to_string();
+        #[cfg(test)]
+        return EXAMPLES_FIELD.to_string();
+    };
+
+    let mut res = "".to_string();
+    for ex in examples.iter().map(|e| e.to_anki()) {
+        res += &format!(
+            "<details><summary>{}</summary>{}</details>",
+            ex.original, ex.translate
+        );
+    }
+    res
 }
 
 #[cfg(test)]
@@ -192,7 +229,6 @@ mod tests {
 
     use super::*;
 
-    /// Test for matching of fields order
     #[test]
     fn test_anki_fields() {
         let word = "word";
@@ -201,7 +237,7 @@ mod tests {
         let transcription = "transcription";
         let picture = "picture";
 
-        let expected = vec![word, reading, translate, transcription];
+        let expected = vec![word, reading, translate, transcription, EXAMPLES_FIELD];
 
         let names = AnkiFieldNames {
             word: word.to_string(),
@@ -219,14 +255,22 @@ mod tests {
                 source: PictureSource::Pixabay,
                 source_id: "asdf".to_string(),
             }),
+            examples: None,
         };
 
+        assert_eq!(names.qfmt(), "{{word}}");
+        assert_eq!(names.qfmt_rev(), "{{translate}}");
+
         let names: Vec<_> = names.names().into_iter().collect();
-        assert_eq!(names[AnkiFieldNames::sort_index() as usize], &word);
-        assert_eq!(names, expected.clone());
+        assert_eq!(
+            names[AnkiFieldNames::sort_index() as usize],
+            word,
+            "sort_index does not point to {word}"
+        );
+        assert_eq!(names, expected.clone(), "field's names are broken");
 
         let fields = fields.list();
         let fields: Vec<_> = fields.iter().map(|f| f.as_str()).collect();
-        assert_eq!(fields, expected);
+        assert_eq!(fields, expected, "field's values are broken");
     }
 }

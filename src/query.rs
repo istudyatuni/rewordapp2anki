@@ -4,7 +4,7 @@ mod func {
     use rusqlite::Row;
 
     use crate::{
-        db::{Picture, Word},
+        db::{Example, Picture, Word},
         deck::{AnkiFieldNames, AnkiFields},
         info::{App, Language, TrInfo},
     };
@@ -43,6 +43,7 @@ mod func {
             picture: Picture::new(r.get("picture_source")?, r.get("picture_source_id")?),
             reading: r.get("reading")?,
             translate: r.get("translate")?,
+            examples: Example::from_db(r.get("examples")?),
             category_ids: vec![r.get("category_id")?],
         })
     }
@@ -88,6 +89,7 @@ mod eng {
            w.transcription,
            null as reading,
            {LANG} as translate,
+           {EXAMPLES} as examples,
            wc.category_id,
            p.source as picture_source,
            p.source_id as picture_source_id
@@ -99,11 +101,14 @@ mod eng {
          where translate is not null";
 
     pub fn words(info: TrInfo) -> String {
-        WORDS.replace("{LANG}", &format!("w.{}", info.tr_lang.kind()))
+        let kind = info.tr_lang.kind();
+        WORDS
+            .replace("{LANG}", &format!("w.{kind}"))
+            .replace("{EXAMPLES}", &format!("w.examples_{kind}"))
     }
 
     pub const LANGUAGES: [Language; 10] = [
-        Language::Chinese,
+        Language::ChineseSimplified,
         Language::Dutch,
         Language::French,
         Language::Deutsch,
@@ -129,6 +134,7 @@ mod jap {
            w.word as reading,
            w.transcription,
            {LANG} as translate,
+           null as examples,
            wc.category_id,
            p.source as picture_source,
            p.source_id as picture_source_id
@@ -172,6 +178,7 @@ mod rus {
            null as reading,
            w.transcription,
            {LANG} as translate,
+           {EXAMPLES} as examples,
            wc.category_id,
            p.source as picture_source,
            p.source_id as picture_source_id
@@ -183,7 +190,10 @@ mod rus {
          where translate is not null";
 
     pub fn words(info: TrInfo) -> String {
-        WORDS.replace("{LANG}", &format!("w.{}", info.tr_lang.kind()))
+        let kind = info.tr_lang.kind();
+        WORDS
+            .replace("{LANG}", &format!("w.{kind}"))
+            .replace("{EXAMPLES}", &format!("w.examples_{kind}"))
     }
 
     pub const LANGUAGES: [Language; 3] = [Language::Deutsch, Language::English, Language::French];

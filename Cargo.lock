@@ -901,6 +901,8 @@ dependencies = [
  "genanki-rs",
  "inquire",
  "rusqlite",
+ "serde",
+ "serde_json",
  "zip 0.6.6",
 ]
 

@@ -23,7 +23,9 @@ pub enum App {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Language {
-    Chinese,
+    ChineseSimplified,
+    #[allow(dead_code)]
+    ChineseTraditional,
     Czech,
     Deutsch,
     Dutch,
@@ -112,7 +114,8 @@ impl Display for App {
 impl Language {
     pub fn kind(&self) -> String {
         let s = match self {
-            Self::Chinese => "zht",
+            Self::ChineseSimplified => "zhs",
+            Self::ChineseTraditional => "zht",
             Self::Czech => "cz",
             Self::Deutsch => "deu",
             Self::Dutch => "du",
@@ -132,7 +135,8 @@ impl Language {
     }
     pub fn display(&self) -> String {
         let s = match self {
-            Self::Chinese => "Chinese",
+            Self::ChineseSimplified => "Chinese",
+            Self::ChineseTraditional => "Chinese traditional",
             Self::Czech => "Czech",
             Self::Deutsch => "Deutsch",
             Self::Dutch => "Dutch",
@@ -161,7 +165,7 @@ impl Display for Language {
 impl From<App> for Language {
     fn from(value: App) -> Self {
         match value {
-            App::Chinese => Self::Chinese,
+            App::Chinese => Self::ChineseSimplified,
             App::Czech => Self::Czech,
             App::Deutsch => Self::Deutsch,
             App::Dutch => Self::Dutch,

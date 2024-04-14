@@ -2,6 +2,7 @@ use std::{collections::HashMap, fmt::Display, path::Path};
 
 use anyhow::Result;
 use rusqlite::Connection;
+use serde::Deserialize;
 
 use crate::{
     info::{Language, TrInfo},
@@ -29,7 +30,10 @@ impl DB {
                     words_count: r.get("words_count")?,
                 })
             })?
-            .filter_map(|c| c.ok())
+            .filter_map(|c| {
+                c.inspect_err(|e| eprintln!("failed to map category: {e}"))
+                    .ok()
+            })
             .collect();
         Ok(categories)
     }
@@ -41,7 +45,7 @@ impl DB {
         let mut st = self.conn.prepare(&app_sql(info.clone()))?;
         let words = st
             .query_map([], app_query_map(info.app))?
-            .filter_map(|c| c.ok())
+            .filter_map(|c| c.inspect_err(|e| eprintln!("failed to map word: {e}")).ok())
             .collect::<Vec<_>>();
         fold_categories(words)
     }
@@ -94,6 +98,7 @@ pub struct Word {
     pub picture: Option<Picture>,
     pub reading: Option<String>,
     pub translate: Option<String>,
+    pub examples: Option<Vec<Example>>,
     pub category_ids: Vec<String>,
 }
 
@@ -150,5 +155,60 @@ impl Display for PictureSource {
             PictureSource::Other(s) => s.as_str(),
         };
         f.pad(s)
+    }
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct Example {
+    #[serde(rename(deserialize = "o"))]
+    pub original: String,
+    #[serde(rename(deserialize = "t"))]
+    pub translate: String,
+}
+
+impl Example {
+    pub fn from_db(s: Option<String>) -> Option<Vec<Self>> {
+        let s = s?;
+        serde_json::from_str(&s)
+            .inspect_err(|e| eprintln!("failed to decode examples {s}\nerror: {e}"))
+            .ok()
+    }
+    pub fn to_anki(&self) -> Self {
+        Self {
+            original: hash2bold(&self.original),
+            translate: hash2bold(&self.translate),
+        }
+    }
+}
+
+/// "asdf #asdf# asdf" -> "asdf <b>asdf</b> asdf"
+fn hash2bold(s: &str) -> String {
+    const HASH: char = '#';
+    s.split_inclusive(HASH)
+        .fold((true, "".to_string()), |(is_open, acc), s| {
+            let sep = if is_open { "<b>" } else { "</b>" };
+            (!is_open, acc + &s.replace(HASH, sep))
+        })
+        .1
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_hash2bold() {
+        let table = [
+            ("asdf", "asdf"),
+            ("#asdf# asdf", "<b>asdf</b> asdf"),
+            ("asdf#asdf#asdf", "asdf<b>asdf</b>asdf"),
+            ("asdf #asdf# asdf", "asdf <b>asdf</b> asdf"),
+            // invalid states
+            ("asdf#asdf#asdf#", "asdf<b>asdf</b>asdf<b>"),
+            ("asdf#asdf#asdf#asdf", "asdf<b>asdf</b>asdf<b>asdf"),
+        ];
+        for (input, expected) in table {
+            assert_eq!(hash2bold(input), expected);
+        }
     }
 }
