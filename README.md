@@ -4,8 +4,8 @@ Convert word lists from [reword.app](https://reword.app) to Anki decks.
 
 ## How
 
-- Download apk (e.g. from [apkpure.com](https://apkpure.com/developer/POAS%20Apps))
-- Install and run this app
+- Download Reword's apk, from which you want to import words (e.g. from [apkpure.com](https://apkpure.com/developer/POAS%20Apps)).
+- Install and run this tool, as described below.
 
 ## Installation
 
@@ -13,7 +13,7 @@ Convert word lists from [reword.app](https://reword.app) to Anki decks.
 cargo install --git=https://github.com/istudyatuni/rewordapp2anki.git
 ```
 
-Then you can run it as `rewordapp2anki`
+Then you can run it as `rewordapp2anki`.
 
 ## Exporting
 
@@ -24,3 +24,11 @@ When specific categories are selected, words that are in those categories are ex
 ## Supported apps
 
 Not all applications are currently supported. After launching this application, you will see a list of supported applications.
+
+## Development
+
+Pre-commit hook
+
+```sh
+git config core.hooksPath .githooks
+```

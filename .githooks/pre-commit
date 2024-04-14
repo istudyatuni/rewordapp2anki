@@ -1,0 +1,7 @@
+#!/bin/sh
+set -euo pipefail
+if [[ ! -z "$(git diff --staged -- src Cargo.lock)" ]]; then
+	cargo fmt --check
+	cargo clippy -- -D warnings
+	cargo test
+fi
