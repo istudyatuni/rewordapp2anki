@@ -9,7 +9,7 @@ Convert word lists from [reword.app](https://reword.app) to Anki decks.
 
 ### Note on .XAPK files
 
-.XAPK files are just ZIP archives. Open this XAPK file, and search inside for APK file with name like `ru.poas.[some name].apk`. Extract this APK, and then select it when asked.
+XAPK files are just ZIP archives, and required APK file is inside it. Open XAPK file, search inside for APK file with name like `ru.poas.[some name].apk`, extract it, and then select extracted APK when asked.
 
 ## Installation
 
