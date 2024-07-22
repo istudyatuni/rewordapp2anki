@@ -47,7 +47,7 @@ impl DB {
             .query_map([], app_query_map(info.app))?
             .filter_map(|c| c.inspect_err(|e| eprintln!("failed to map word: {e}")).ok())
             .collect::<Vec<_>>();
-        fold_categories(words)
+        Ok(fold_categories(words))
     }
     /*pub fn delete_words(&mut self, ids: &[i64]) -> Result<()> {
         let tx = self.conn.transaction()?;
@@ -103,7 +103,7 @@ pub struct Word {
 }
 
 /// Merge multiple equal words with categories to one word
-fn fold_categories(words: Vec<Word>) -> Result<Vec<Word>> {
+fn fold_categories(words: Vec<Word>) -> Vec<Word> {
     let mut map: HashMap<i64, Word> = HashMap::with_capacity(words.len());
     for w in words {
         if let Some(e) = map.get_mut(&w.id) {
@@ -112,7 +112,7 @@ fn fold_categories(words: Vec<Word>) -> Result<Vec<Word>> {
             map.insert(w.id, w);
         }
     }
-    Ok(map.into_values().collect())
+    map.into_values().collect()
 }
 
 #[allow(unused)]
