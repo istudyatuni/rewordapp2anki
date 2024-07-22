@@ -11,6 +11,7 @@ mod func {
 
     use super::*;
 
+    /// Where sqlite db is located inside apk
     pub fn app_apk_db_path(app: App) -> &'static str {
         match app {
             App::Russian => "res/kv",
@@ -18,10 +19,14 @@ mod func {
         }
     }
 
+    /// Pseudo-random and stable id for anki collection
     pub fn app_model_id(app: App) -> i64 {
         10964854234530 + app as i64
     }
 
+    /// SQL query for extracting words
+    //
+    // Names of fields matches names in App::map_row
     pub fn app_sql(info: TrInfo) -> String {
         match info.app {
             App::Deutsch => deu::words(info),
@@ -32,6 +37,7 @@ mod func {
         }
     }
 
+    // Separate function for case if some app will require different extracting
     pub fn app_query_map(_app: App) -> impl FnMut(&Row<'_>) -> rusqlite::Result<Word> {
         map_row
     }

@@ -25,6 +25,7 @@ mod info;
 mod inquire_autocomplete_path;
 mod query;
 
+/// Minimum number of words to measure approximated export time
 const APPROX_BOUND: usize = 100;
 
 const DEFAULT_OUTPUT_FILE: &str = "reword.apkg";
@@ -69,7 +70,7 @@ fn main() -> Result<()> {
     // export with timer
     let timer = Instant::now();
     let mut deck = DeckWriter::new(input.tr);
-    if words.len() > APPROX_BOUND {
+    if words.len() > APPROX_BOUND * 2 {
         let timer = Instant::now();
         for w in &words[..APPROX_BOUND] {
             deck.word(w)?;
