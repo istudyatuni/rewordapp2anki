@@ -115,6 +115,7 @@ fn fold_categories(words: Vec<Word>) -> Result<Vec<Word>> {
     Ok(map.into_values().collect())
 }
 
+#[allow(unused)]
 #[derive(Debug, Clone)]
 pub struct Picture {
     pub source: PictureSource,
