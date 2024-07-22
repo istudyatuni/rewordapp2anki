@@ -89,25 +89,28 @@ mod func {
     }
 }
 
+const COMMON_WORDS_SQL: &str = "
+select
+   w.id,
+   w.word,
+   w.transcription,
+   null as reading,
+   {LANG} as translate,
+   {EXAMPLES} as examples,
+   wc.category_id,
+   p.source as picture_source,
+   p.source_id as picture_source_id
+ from word w
+ join word_category wc
+   on w.id = wc.word_id
+ full outer join picture p
+   on p.id = w.picture_id
+ where translate is not null";
+
 mod deu {
     use crate::info::{Language, TrInfo};
 
-    const WORDS: &str = "select
-           w.id,
-           w.word,
-           w.transcription,
-           null as reading,
-           {LANG} as translate,
-           {EXAMPLES} as examples,
-           wc.category_id,
-           p.source as picture_source,
-           p.source_id as picture_source_id
-         from word w
-         join word_category wc
-           on w.id = wc.word_id
-         full outer join picture p
-           on p.id = w.picture_id
-         where translate is not null";
+    const WORDS: &str = super::COMMON_WORDS_SQL;
 
     pub fn words(info: TrInfo) -> String {
         let kind = info.tr_lang.kind();
@@ -122,22 +125,7 @@ mod deu {
 mod eng {
     use crate::info::{Language, TrInfo};
 
-    const WORDS: &str = "select
-           w.id,
-           w.word,
-           w.transcription,
-           null as reading,
-           {LANG} as translate,
-           {EXAMPLES} as examples,
-           wc.category_id,
-           p.source as picture_source,
-           p.source_id as picture_source_id
-         from word w
-         join word_category wc
-           on w.id = wc.word_id
-         full outer join picture p
-           on p.id = w.picture_id
-         where translate is not null";
+    const WORDS: &str = super::COMMON_WORDS_SQL;
 
     pub fn words(info: TrInfo) -> String {
         let kind = info.tr_lang.kind();
@@ -211,22 +199,7 @@ mod jap {
 mod rus {
     use crate::info::{Language, TrInfo};
 
-    const WORDS: &str = "select
-           w.id,
-           w.word,
-           null as reading,
-           w.transcription,
-           {LANG} as translate,
-           {EXAMPLES} as examples,
-           wc.category_id,
-           p.source as picture_source,
-           p.source_id as picture_source_id
-         from word w
-         join word_category wc
-           on w.id = wc.word_id
-         full outer join picture p
-           on p.id = w.picture_id
-         where translate is not null";
+    const WORDS: &str = super::COMMON_WORDS_SQL;
 
     pub fn words(info: TrInfo) -> String {
         let kind = info.tr_lang.kind();
