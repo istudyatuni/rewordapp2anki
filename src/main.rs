@@ -7,17 +7,15 @@ use std::{
 
 use anyhow::{anyhow, Result};
 use clap::Parser;
-use db::Category;
-use info::App;
 use inquire::{Confirm, MultiSelect, Select, Text};
-use inquire_autocomplete_path::FilePathCompleter;
-use query::{app_apk_db_path, app_languages};
 use zip::ZipArchive;
 
 use crate::{
-    db::DB,
+    db::{Category, DB},
     deck::DeckWriter,
-    info::{Language, TrInfo},
+    info::{App, Language, TrInfo},
+    inquire_autocomplete_path::FilePathCompleter,
+    query::{app_apk_db_path, app_languages},
 };
 
 mod args;

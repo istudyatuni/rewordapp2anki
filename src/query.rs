@@ -24,6 +24,7 @@ mod func {
 
     pub fn app_sql(info: TrInfo) -> String {
         match info.app {
+            App::Deutsch => deu::words(info),
             App::English => eng::words(info),
             App::Japanese => jap::words(info),
             App::Russian => rus::words(info),
@@ -70,14 +71,46 @@ mod func {
         }
     }
 
+    /// List of languages supported by app for learning
     pub fn app_languages(app: App) -> &'static [Language] {
         match app {
+            App::Deutsch => &deu::LANGUAGES,
             App::English => &eng::LANGUAGES,
             App::Japanese => &jap::LANGUAGES,
             App::Russian => &rus::LANGUAGES,
             _ => todo!("app not yet supported"),
         }
     }
+}
+
+mod deu {
+    use crate::info::{Language, TrInfo};
+
+    const WORDS: &str = "select
+           w.id,
+           w.word,
+           w.transcription,
+           null as reading,
+           {LANG} as translate,
+           {EXAMPLES} as examples,
+           wc.category_id,
+           p.source as picture_source,
+           p.source_id as picture_source_id
+         from word w
+         join word_category wc
+           on w.id = wc.word_id
+         full outer join picture p
+           on p.id = w.picture_id
+         where translate is not null";
+
+    pub fn words(info: TrInfo) -> String {
+        let kind = info.tr_lang.kind();
+        WORDS
+            .replace("{LANG}", &format!("w.{kind}"))
+            .replace("{EXAMPLES}", &format!("w.examples_{kind}"))
+    }
+
+    pub const LANGUAGES: [Language; 2] = [Language::English, Language::Russian];
 }
 
 mod eng {

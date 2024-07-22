@@ -6,6 +6,7 @@ use std::fmt::Display;
 pub enum App {
     Chinese,
     Czech,
+    /// German
     Deutsch,
     Dutch,
     English,
@@ -27,6 +28,7 @@ pub enum Language {
     #[allow(dead_code)]
     ChineseTraditional,
     Czech,
+    /// German
     Deutsch,
     Dutch,
     English,
@@ -53,7 +55,7 @@ pub struct TrInfo {
 }
 
 impl App {
-    pub const SUPPORTED: [App; 3] = [App::English, App::Japanese, App::Russian];
+    pub const SUPPORTED: [App; 4] = [App::English, App::Deutsch, App::Japanese, App::Russian];
 
     pub fn kind(&self) -> String {
         let s = match self {
