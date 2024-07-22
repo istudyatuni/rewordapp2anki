@@ -13,6 +13,8 @@ XAPK files are just ZIP archives, and required APK file is inside it. Open XAPK 
 
 ## Installation
 
+Requires [rustup](https://rustup.rs) installed.
+
 ```sh
 cargo install --git=https://github.com/istudyatuni/rewordapp2anki.git
 ```
