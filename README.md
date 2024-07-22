@@ -7,6 +7,10 @@ Convert word lists from [reword.app](https://reword.app) to Anki decks.
 - Download Reword's apk, from which you want to import words (e.g. from [apkpure.com](https://apkpure.com/developer/POAS%20Apps)).
 - Install and run this tool, as described below.
 
+### Note on .XAPK files
+
+.XAPK files are just ZIP archives. Open this XAPK file, and search inside for APK file with name like `ru.poas.[some name].apk`. Extract this APK, and then select it when asked.
+
 ## Installation
 
 ```sh
