@@ -1,5 +1,7 @@
 pub use func::*;
 
+use crate::info::TrInfo;
+
 mod func {
     use rusqlite::Row;
 
@@ -29,10 +31,10 @@ mod func {
     // Names of fields matches names in App::map_row
     pub fn app_sql(info: TrInfo) -> String {
         match info.app {
-            App::Deutsch => deu::words(info),
-            App::English => eng::words(info),
+            App::Deutsch => words_common(info),
+            App::English => words_common(info),
             App::Japanese => jap::words(info),
-            App::Russian => rus::words(info),
+            App::Russian => words_common(info),
             _ => todo!("app not yet supported"),
         }
     }
@@ -107,38 +109,27 @@ select
    on p.id = w.picture_id
  where translate is not null";
 
+fn words_common(info: TrInfo) -> String {
+    let kind = info.tr_lang.kind();
+    COMMON_WORDS_SQL
+        .replace("{LANG}", &format!("w.{kind}"))
+        .replace("{EXAMPLES}", &format!("w.examples_{kind}"))
+}
+
 mod deu {
-    use crate::info::{Language, TrInfo};
-
-    const WORDS: &str = super::COMMON_WORDS_SQL;
-
-    pub fn words(info: TrInfo) -> String {
-        let kind = info.tr_lang.kind();
-        WORDS
-            .replace("{LANG}", &format!("w.{kind}"))
-            .replace("{EXAMPLES}", &format!("w.examples_{kind}"))
-    }
+    use crate::info::Language;
 
     pub const LANGUAGES: [Language; 2] = [Language::English, Language::Russian];
 }
 
 mod eng {
-    use crate::info::{Language, TrInfo};
-
-    const WORDS: &str = super::COMMON_WORDS_SQL;
-
-    pub fn words(info: TrInfo) -> String {
-        let kind = info.tr_lang.kind();
-        WORDS
-            .replace("{LANG}", &format!("w.{kind}"))
-            .replace("{EXAMPLES}", &format!("w.examples_{kind}"))
-    }
+    use crate::info::Language;
 
     pub const LANGUAGES: [Language; 10] = [
         Language::ChineseSimplified,
+        Language::Deutsch,
         Language::Dutch,
         Language::French,
-        Language::Deutsch,
         Language::Italian,
         Language::Japanese,
         Language::Korean,
@@ -197,16 +188,7 @@ mod jap {
 }
 
 mod rus {
-    use crate::info::{Language, TrInfo};
-
-    const WORDS: &str = super::COMMON_WORDS_SQL;
-
-    pub fn words(info: TrInfo) -> String {
-        let kind = info.tr_lang.kind();
-        WORDS
-            .replace("{LANG}", &format!("w.{kind}"))
-            .replace("{EXAMPLES}", &format!("w.examples_{kind}"))
-    }
+    use crate::info::Language;
 
     pub const LANGUAGES: [Language; 3] = [Language::Deutsch, Language::English, Language::French];
 }
