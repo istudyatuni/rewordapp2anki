@@ -70,7 +70,7 @@ fn main() -> Result<()> {
     // export with timer
     let timer = Instant::now();
     let mut deck = DeckWriter::new(input.tr);
-    if words.len() > APPROX_BOUND * 2 {
+    if words.len() > APPROX_BOUND / 2 {
         let timer = Instant::now();
         for w in &words[..APPROX_BOUND] {
             deck.word(w)?;
