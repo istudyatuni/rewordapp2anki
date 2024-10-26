@@ -560,15 +560,14 @@ dependencies = [
 
 [[package]]
 name = "inquire"
-version = "0.7.4"
-source = "git+https://github.com/istudyatuni/inquire.git?branch=fix-autocomplete#e107f3ab820dcffb9727d2b2507cd9d9fc782ebe"
+version = "0.7.5"
+source = "git+https://github.com/mikaelmello/inquire.git?rev=446ce3d#446ce3d134a7e5e6158ecbd4ceb24e3c13abde61"
 dependencies = [
  "bitflags 2.5.0",
  "crossterm",
  "dyn-clone",
  "fuzzy-matcher",
  "fxhash",
- "newline-converter",
  "once_cell",
  "unicode-segmentation",
  "unicode-width",
@@ -686,15 +685,6 @@ dependencies = [
  "log",
  "wasi 0.11.0+wasi-snapshot-preview1",
  "windows-sys 0.48.0",
-]
-
-[[package]]
-name = "newline-converter"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47b6b097ecb1cbfed438542d16e84fd7ad9b0c76c8a65b7f9039212a3d14dc7f"
-dependencies = [
- "unicode-segmentation",
 ]
 
 [[package]]

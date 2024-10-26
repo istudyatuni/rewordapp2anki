@@ -9,7 +9,7 @@ anyhow = "1.0.82"
 clap = { version = "4.5.4", features = ["derive"] }
 dirs = "5.0.1"
 genanki-rs = { git = "https://github.com/istudyatuni/genanki-rs.git", branch = "rusqlite-bundle", default-features = false }
-inquire = { git = "https://github.com/istudyatuni/inquire.git", branch = "fix-autocomplete" }
+inquire = { git = "https://github.com/mikaelmello/inquire.git", rev = "446ce3d" }
 rusqlite = { version = "0.25.1", features = ["modern_sqlite"] }
 serde = { version = "1.0.197", features = ["derive"] }
 serde_json = "1.0.115"
