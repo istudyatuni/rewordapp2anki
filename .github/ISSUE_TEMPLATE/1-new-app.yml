@@ -1,0 +1,24 @@
+name: Support not yet supported app
+description: For requests to support new app
+title: Support new app
+labels:
+  - app-support
+body:
+  - type: dropdown
+    id: app
+    attributes:
+      label: App name
+      options:
+        - Learn Chinese with flashcards
+        - Learn Czech with flashcards
+        - Learn Dutch with flashcards
+        - Learn Finnish with flashcards
+        - Learn French with flashcards
+        - Learn Italian with flashcards
+        - Learn Korean with flashcards
+        - Learn Polish with flashcards
+        - Learn Portuguese with ReWord
+        - Learn Spanish with flashcards
+        - Learn Turkish with flashcards
+    validations:
+      required: true
