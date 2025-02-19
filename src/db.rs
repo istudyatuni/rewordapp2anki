@@ -80,7 +80,7 @@ impl Category {
          where c.is_custom = 0";
 
     fn list_sql(lang: Language) -> String {
-        Self::LIST_SQL.replace("{LANG}", &format!("c.name_{}", lang.kind()))
+        Self::LIST_SQL.replace("{LANG}", &format!("c.name_{}", lang.db_name()))
     }
 }
 

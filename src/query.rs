@@ -110,10 +110,10 @@ select
  where translate is not null";
 
 fn words_common(info: TrInfo) -> String {
-    let kind = info.tr_lang.kind();
+    let db_name = info.tr_lang.db_name();
     COMMON_WORDS_SQL
-        .replace("{LANG}", &format!("w.{kind}"))
-        .replace("{EXAMPLES}", &format!("w.examples_{kind}"))
+        .replace("{LANG}", &format!("w.{db_name}"))
+        .replace("{EXAMPLES}", &format!("w.examples_{db_name}"))
 }
 
 mod deu {
@@ -164,7 +164,7 @@ mod jap {
          where translate is not null";
 
     pub fn words(info: TrInfo) -> String {
-        WORDS.replace("{LANG}", &format!("w.{}", info.tr_lang.kind()))
+        WORDS.replace("{LANG}", &format!("w.{}", info.tr_lang.db_name()))
     }
 
     pub const LANGUAGES: [Language; 2] = [Language::English, Language::Russian];

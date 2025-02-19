@@ -114,7 +114,8 @@ impl Display for App {
 }
 
 impl Language {
-    pub fn kind(&self) -> String {
+    /// Name of language column in DB
+    pub fn db_name(&self) -> String {
         let s = match self {
             Self::ChineseSimplified => "zhs",
             Self::ChineseTraditional => "zht",
