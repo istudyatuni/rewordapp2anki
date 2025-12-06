@@ -77,7 +77,9 @@ impl Category {
                where wc.category_id = c.id
            ) as words_count
          from category c
-         where c.is_custom = 0";
+         where c.is_custom = 0
+            and name is not null
+         order by name";
 
     fn list_sql(lang: Language) -> String {
         Self::LIST_SQL.replace("{LANG}", &format!("c.name_{}", lang.db_name()))
