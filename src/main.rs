@@ -114,6 +114,8 @@ fn ask(no_cache: bool) -> Result<Input> {
             .with_help_message(&help_message)
             .prompt()?;
         extract_db(app, apk_path, &db_path)?;
+    } else {
+        eprintln!("Using cached apk, run with --no-cache to select again");
     }
 
     let learn_lang = app.into();
