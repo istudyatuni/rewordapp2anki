@@ -954,6 +954,7 @@ dependencies = [
  "anyhow",
  "clap",
  "dirs",
+ "fuzzy-matcher",
  "genanki-rs",
  "inquire",
  "rusqlite",

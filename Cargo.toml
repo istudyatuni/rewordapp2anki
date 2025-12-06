@@ -12,6 +12,7 @@ sqlite-bundled = ["rusqlite/bundled", "genanki-rs/sqlite-bundled"]
 anyhow = "1.0.100"
 clap = { version = "4.5.53", features = ["derive"] }
 dirs = "6.0.0"
+fuzzy-matcher = "0.3.7"
 genanki-rs = { git = "https://github.com/istudyatuni/genanki-rs.git", branch = "master", default-features = false }
 inquire = "0.9.1"
 rusqlite = { version = "0.37.0", features = ["modern_sqlite"] }
