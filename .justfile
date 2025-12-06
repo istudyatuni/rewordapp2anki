@@ -16,6 +16,7 @@ build-linux: && pack-linux
 		-v "$HOME/.cargo":/tmp/.cargo \
 		-w /build \
 		--env=CARGO_HOME=/tmp/.cargo \
+		--env=RUSTFLAGS="--remap-path-prefix /tmp=/build" \
 		ghcr.io/rust-cross/rust-musl-cross:x86_64-musl \
 		cargo build --release \
 			--features sqlite-bundled \
@@ -23,6 +24,7 @@ build-linux: && pack-linux
 			--config build.rustc-wrapper="''"
 
 build-win: && pack-win
+	RUSTFLAGS="--remap-path-prefix $HOME=/build" \
 	cargo xwin b --release --target={{ win-target }} --features sqlite-bundled
 
 [private]
