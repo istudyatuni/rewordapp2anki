@@ -11,15 +11,17 @@ Convert word lists from [reword.app](https://reword.app) to Anki decks.
 
 XAPK files are just ZIP archives, and required APK file is inside it. Open XAPK file, search inside for APK file with name like `ru.poas.[some name].apk`, extract it, and then select extracted APK when asked.
 
-## Installation
+## Installation and usage
 
-Requires [rustup](https://rustup.rs) installed.
+You can download pre-built binaries from [latest release](https://github.com/istudyatuni/rewordapp2anki/releases/latest). Unpack downloaded archive, then you need to run it from the shell/command line:
 
 ```sh
-cargo install --git=https://github.com/istudyatuni/rewordapp2anki.git
-```
+# on linux
+./rewordapp2anki
 
-Then you can run it as `rewordapp2anki`.
+# on windows
+./rewordapp2anki.exe
+```
 
 ## Exporting
 
