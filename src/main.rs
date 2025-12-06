@@ -11,7 +11,7 @@ use inquire::{Confirm, MultiSelect, Select, Text};
 use zip::ZipArchive;
 
 use crate::{
-    db::{Category, DB},
+    db::{Category, Word, DB},
     deck::DeckWriter,
     info::{App, Language, TrInfo},
     inquire_autocomplete_path::FilePathCompleter,
@@ -40,7 +40,13 @@ struct Input {
 fn main() -> Result<()> {
     let args = args::Cli::parse();
     let input = ask(args.no_cache)?;
-    let db = DB::new(input.db_path)?;
+    let words = run(&input)?;
+    export_deck(input, words)?;
+    Ok(())
+}
+
+fn run(input: &Input) -> Result<Vec<Word>> {
+    let db = DB::new(input.db_path.clone())?;
 
     let total_words = db.words_count()?;
     let words = db.list_words(input.tr.clone())?;
@@ -67,7 +73,10 @@ fn main() -> Result<()> {
     };
     println!("Words to export: {}", words.len());
 
-    // export with timer
+    Ok(words)
+}
+
+fn export_deck(input: Input, words: Vec<db::Word>) -> Result<(), anyhow::Error> {
     let timer = Instant::now();
     let mut deck = DeckWriter::new(input.tr);
     if words.len() > APPROX_BOUND / 2 {
