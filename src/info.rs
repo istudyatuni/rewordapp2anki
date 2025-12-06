@@ -55,7 +55,13 @@ pub struct TrInfo {
 }
 
 impl App {
-    pub const SUPPORTED: [App; 4] = [App::English, App::Deutsch, App::Japanese, App::Russian];
+    pub const SUPPORTED: &[App] = &[
+        App::English,
+        App::Deutsch,
+        App::Finnish,
+        App::Japanese,
+        App::Russian,
+    ];
 
     pub fn kind(&self) -> String {
         let s = match self {

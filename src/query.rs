@@ -33,6 +33,7 @@ mod func {
         match info.app {
             App::Deutsch => words_common(info),
             App::English => words_common(info),
+            App::Finnish => words_common(info),
             App::Japanese => jap::words(info),
             App::Russian => words_common(info),
             _ => todo!("app not yet supported"),
@@ -84,6 +85,7 @@ mod func {
         match app {
             App::Deutsch => &deu::LANGUAGES,
             App::English => &eng::LANGUAGES,
+            App::Finnish => &fin::LANGUAGES,
             App::Japanese => &jap::LANGUAGES,
             App::Russian => &rus::LANGUAGES,
             _ => todo!("app not yet supported"),
@@ -191,4 +193,10 @@ mod rus {
     use crate::info::Language;
 
     pub const LANGUAGES: [Language; 3] = [Language::Deutsch, Language::English, Language::French];
+}
+
+mod fin {
+    use crate::info::Language;
+
+    pub const LANGUAGES: [Language; 2] = [Language::English, Language::Russian];
 }
