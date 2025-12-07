@@ -5,13 +5,13 @@ use std::{
     time::Instant,
 };
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use clap::Parser;
 use inquire::{Confirm, MultiSelect, Select, Text};
 use zip::ZipArchive;
 
 use crate::{
-    db::{Category, Word, DB},
+    db::{Category, DB, Word},
     deck::DeckWriter,
     info::{App, Language, TrInfo},
     inquire_autocomplete_path::FilePathCompleter,

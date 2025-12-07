@@ -2,10 +2,10 @@
 
 use std::io::ErrorKind;
 
-use fuzzy_matcher::skim::SkimMatcherV2;
 use fuzzy_matcher::FuzzyMatcher;
-use inquire::autocompletion::{Autocomplete, Replacement};
+use fuzzy_matcher::skim::SkimMatcherV2;
 use inquire::CustomUserError;
+use inquire::autocompletion::{Autocomplete, Replacement};
 
 #[derive(Clone, Default)]
 pub struct FilePathCompleter {
