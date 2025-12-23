@@ -608,6 +608,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "inquire-derive"
+version = "0.9.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72dd870d595ca6f13c6bf7c5139e7fc8d9d0bd50fcfcebd736f427beb4616c28"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "is_terminal_polyfill"
 version = "1.70.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -957,6 +968,7 @@ dependencies = [
  "fuzzy-matcher",
  "genanki-rs",
  "inquire",
+ "inquire-derive",
  "rusqlite",
  "serde",
  "serde_json",

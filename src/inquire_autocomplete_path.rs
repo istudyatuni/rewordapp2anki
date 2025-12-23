@@ -62,6 +62,7 @@ impl FilePathCompleter {
         Ok(())
     }
 
+    #[expect(clippy::unnecessary_sort_by)]
     fn fuzzy_sort(&self, input: &str) -> Vec<(String, i64)> {
         let mut matches: Vec<(String, i64)> = self
             .paths

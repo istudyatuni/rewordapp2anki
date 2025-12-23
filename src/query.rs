@@ -1,6 +1,6 @@
 pub use func::*;
 
-use crate::info::TrInfo;
+use crate::info::AppTranslationInfo;
 
 mod func {
     use rusqlite::Row;
@@ -8,7 +8,7 @@ mod func {
     use crate::{
         db::{Example, Picture, Word},
         deck::{AnkiFieldNames, AnkiFields},
-        info::{App, Language, TrInfo},
+        info::{App, AppTranslationInfo, Language},
     };
 
     use super::*;
@@ -29,7 +29,7 @@ mod func {
     /// SQL query for extracting words
     //
     // Names of fields matches names in App::map_row
-    pub fn app_sql(info: TrInfo) -> String {
+    pub fn app_sql(info: &AppTranslationInfo) -> String {
         match info.app {
             App::Deutsch => words_common(info),
             App::English => words_common(info),
@@ -111,7 +111,7 @@ select
    on p.id = w.picture_id
  where translate is not null";
 
-fn words_common(info: TrInfo) -> String {
+fn words_common(info: &AppTranslationInfo) -> String {
     let db_name = info.tr_lang.db_name();
     COMMON_WORDS_SQL
         .replace("{LANG}", &format!("w.{db_name}"))
@@ -145,7 +145,7 @@ mod jap {
     use crate::{
         db::Word,
         deck::{AnkiFieldNames, AnkiFields},
-        info::{Language, TrInfo},
+        info::AppTranslationInfo,
     };
 
     const WORDS: &str = "select
@@ -165,7 +165,7 @@ mod jap {
            on p.id = w.picture_id
          where translate is not null";
 
-    pub fn words(info: TrInfo) -> String {
+    pub fn words(info: &AppTranslationInfo) -> String {
         WORDS.replace("{LANG}", &format!("w.{}", info.tr_lang.db_name()))
     }
 

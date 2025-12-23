@@ -6,6 +6,7 @@ Convert word lists from [reword.app](https://reword.app) to Anki decks.
 
 - Download Reword's apk, from which you want to import words (e.g. from [apkpure.com](https://apkpure.com/developer/POAS%20Apps)).
 - Install and run this tool, as described below.
+- If you want to convert custom categories, you don't need an apk file, see [below](#exporting-custom-categories) for usage.
 
 ### Note on .XAPK files
 
@@ -20,9 +21,19 @@ You can download pre-built binaries from [latest release](https://github.com/ist
 
 ## Exporting
 
+### Exporting built-in categories
+
+Select "APK file" in first question.
+
 Categories are saved as tags, so you can export all words at once, and then create filtered decks for specific categories.
 
 When specific categories are selected, words that are in those categories are exported, even if those words occur in other categories. Also, category tags that are not selected will not be removed from the exported words.
+
+### Exporting custom categories
+
+Select "Custom categories" in first question.
+
+To convert custom categories you need to "Share" if from the app, and then select these `.reword` files when asked. Select as many files as you want, then press `Esc` to continue.
 
 ## Supported apps
 

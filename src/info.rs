@@ -1,8 +1,9 @@
 use std::fmt::Display;
 
+use inquire_derive::Selectable;
+
 // Order of fields are important and used for calculating Anki model's id
-#[allow(dead_code)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Selectable)]
 pub enum App {
     Chinese,
     Czech,
@@ -22,10 +23,9 @@ pub enum App {
     Turkish,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Selectable)]
 pub enum Language {
     ChineseSimplified,
-    #[allow(dead_code)]
     ChineseTraditional,
     Czech,
     /// German
@@ -45,7 +45,7 @@ pub enum Language {
 }
 
 #[derive(Debug, Clone)]
-pub struct TrInfo {
+pub struct AppTranslationInfo {
     /// Reword's app kind
     pub app: App,
     /// App's target language
@@ -142,6 +142,27 @@ impl Language {
         };
         s.to_owned()
     }
+    pub fn from_db_name(s: &str) -> Self {
+        match s {
+            "zhs" => Self::ChineseSimplified,
+            "zht" => Self::ChineseTraditional,
+            "cz" => Self::Czech,
+            "deu" => Self::Deutsch,
+            "du" => Self::Dutch,
+            "eng" => Self::English,
+            "fin" => Self::Finnish,
+            "fra" => Self::French,
+            "ita" => Self::Italian,
+            "jpn" => Self::Japanese,
+            "kor" => Self::Korean,
+            "pol" => Self::Polish,
+            "por" => Self::Portuguese,
+            "rus" => Self::Russian,
+            "spa" => Self::Spanish,
+            "tur" => Self::Turkish,
+            _ => unreachable!("unknown db_name {s:?}"),
+        }
+    }
     pub fn display(&self) -> String {
         let s = match self {
             Self::ChineseSimplified => "Chinese",
@@ -189,6 +210,19 @@ impl From<App> for Language {
             App::Russian => Self::Russian,
             App::Spanish => Self::Spanish,
             App::Turkish => Self::Turkish,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_lang_from_db_name() {
+        use crate::info::__inquire_enum_choice_for_language::Variants;
+        for lang in Language::VARIANTS {
+            assert_eq!(Language::from_db_name(lang.db_name().as_str()), *lang);
         }
     }
 }

@@ -5,7 +5,7 @@ use rusqlite::Connection;
 use serde::Deserialize;
 
 use crate::{
-    info::{Language, TrInfo},
+    info::{AppTranslationInfo, Language},
     query::{app_query_map, app_sql},
 };
 
@@ -41,8 +41,8 @@ impl DB {
         let mut st = self.conn.prepare("select count(*) as count from word")?;
         Ok(st.query_row([], |r| r.get("count"))?)
     }
-    pub fn list_words(&self, info: TrInfo) -> Result<Vec<Word>> {
-        let mut st = self.conn.prepare(&app_sql(info.clone()))?;
+    pub fn list_words(&self, info: &AppTranslationInfo) -> Result<Vec<Word>> {
+        let mut st = self.conn.prepare(&app_sql(info))?;
         let words = st
             .query_map([], app_query_map(info.app))?
             .filter_map(|c| c.inspect_err(|e| eprintln!("failed to map word: {e}")).ok())
@@ -96,7 +96,7 @@ impl Display for Category {
 pub struct Word {
     pub id: i64,
     pub word: Option<String>,
-    pub transcription: String,
+    pub transcription: Option<String>,
     pub picture: Option<Picture>,
     pub reading: Option<String>,
     pub translate: Option<String>,

@@ -3,7 +3,7 @@ use genanki_rs::{Deck, Field, Model, Note, Template};
 
 use crate::{
     db::{Example, Picture, Word},
-    info::TrInfo,
+    info::AppTranslationInfo,
     query::{app_anki_fields, app_anki_values, app_model_id},
 };
 
@@ -29,11 +29,12 @@ const EXAMPLES: &str = "
 pub struct DeckWriter {
     model: Model,
     deck: Deck,
-    info: TrInfo,
+    info: AppTranslationInfo,
+    mark_custom: bool,
 }
 
 impl DeckWriter {
-    pub fn new(info: TrInfo) -> Self {
+    pub fn new(info: AppTranslationInfo, as_custom: bool) -> Self {
         let fields = app_anki_fields(info.app);
         let model = Model::new(
             app_model_id(info.app),
@@ -58,14 +59,26 @@ impl DeckWriter {
         )
         .css(CSS)
         .sort_field_index(AnkiFieldNames::sort_index());
+
+        let custom_marker = if as_custom { " (custom)" } else { "" };
         let deck = Deck::new(
-            965781129384,
-            &format!("Reword {} - {}", info.app.display(), info.tr_lang.display()),
+            965781129384 + as_custom as i64,
+            &format!(
+                "Reword {} - {}{custom_marker}",
+                info.app.display(),
+                info.tr_lang.display()
+            ),
             "",
         );
-        Self { model, deck, info }
+        Self {
+            model,
+            deck,
+            info,
+            mark_custom: as_custom,
+        }
     }
     pub fn word(&mut self, w: &Word) -> Result<()> {
+        let custom_id_marker = if self.mark_custom { "-custom" } else { "" };
         self.deck.add_note(Note::new_with_options(
             self.model.clone(),
             app_anki_values(self.info.app, w)
@@ -75,7 +88,11 @@ impl DeckWriter {
                 .collect(),
             None,
             Some(w.category_ids.iter().map(|c| c.as_str()).collect()),
-            Some(&format!("reword-{}-{}", self.info.app.kind(), w.id)),
+            Some(&format!(
+                "reword-{}-{}{custom_id_marker}",
+                self.info.app.kind(),
+                w.id
+            )),
         )?);
         Ok(())
     }
@@ -89,7 +106,7 @@ impl DeckWriter {
 pub struct AnkiFields {
     pub word: Option<String>,
     pub reading: Option<String>,
-    pub transcription: String,
+    pub transcription: Option<String>,
     pub translate: Option<String>,
     #[allow(unused)]
     pub picture: Option<Picture>,
@@ -102,7 +119,10 @@ impl AnkiFields {
             self.word.clone().unwrap_or_default(),
             self.reading.clone().unwrap_or_default(),
             self.translate.clone().unwrap_or_default(),
-            self.transcription.clone(),
+            self.transcription
+                .as_deref()
+                .unwrap_or_default()
+                .to_string(),
             /*self.picture
             .clone()
             .map(|p| format!("{}:{}", p.source, p.source_id))
@@ -236,22 +256,28 @@ mod tests {
         let word = "word";
         let reading = "reading";
         let translate = "translate";
-        let transcription = "transcription";
+        let transcription = Some("transcription".to_string());
         let picture = "picture";
 
-        let expected = vec![word, reading, translate, transcription, EXAMPLES_FIELD];
+        let expected = vec![
+            word,
+            reading,
+            translate,
+            transcription.as_deref().unwrap(),
+            EXAMPLES_FIELD,
+        ];
 
         let names = AnkiFieldNames {
             word: word.to_string(),
             reading: reading.to_string(),
-            transcription: transcription.to_string(),
+            transcription: transcription.clone().unwrap(),
             translate: translate.to_string(),
             picture: picture.to_string(),
         };
         let fields = AnkiFields {
             word: Some(word.to_string()),
             reading: Some(reading.to_string()),
-            transcription: transcription.to_string(),
+            transcription: transcription.clone(),
             translate: Some(translate.to_string()),
             picture: Some(Picture {
                 source: PictureSource::Pixabay,
