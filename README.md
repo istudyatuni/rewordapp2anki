@@ -13,15 +13,10 @@ XAPK files are just ZIP archives, and required APK file is inside it. Open XAPK 
 
 ## Installation and usage
 
-You can download pre-built binaries from [latest release](https://github.com/istudyatuni/rewordapp2anki/releases/latest). Unpack downloaded archive, then you need to run it from the shell/command line:
+You can download pre-built binaries from [latest release](https://github.com/istudyatuni/rewordapp2anki/releases/latest). Unpack downloaded archive, then:
 
-```sh
-# on linux
-./rewordapp2anki
-
-# on windows
-./rewordapp2anki.exe
-```
+- Linux: run as `./rewordapp2anki`
+- Windows: run from the file explorer
 
 ## Exporting
 
