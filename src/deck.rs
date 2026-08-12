@@ -108,7 +108,7 @@ pub struct AnkiFields {
     pub reading: Option<String>,
     pub transcription: Option<String>,
     pub translate: Option<String>,
-    #[allow(unused)]
+    #[expect(unused)]
     pub picture: Option<Picture>,
     pub examples: Option<Vec<Example>>,
 }
@@ -151,7 +151,7 @@ pub struct AnkiFieldNames {
     pub reading: String,
     pub transcription: String,
     pub translate: String,
-    #[allow(unused)]
+    #[expect(unused)]
     pub picture: String,
 }
 
