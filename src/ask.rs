@@ -112,7 +112,7 @@ fn ask_custom_categories() -> Result<ExportSpecificAnswer> {
 
     // deduplicate
     let mut paths = HashSet::new();
-    while let Some(p) = Text::new("Path to .reword file:")
+    while let Some(p) = Text::new("Path to .reword file or directory:")
         .with_maybe_render_config(cancel_render, !paths.is_empty())
         .with_autocomplete(FilePathCompleter::default())
         .with_help_message(&help)
@@ -120,7 +120,40 @@ fn ask_custom_categories() -> Result<ExportSpecificAnswer> {
         .with_validator(validator::validate_reword_custom_category)
         .prompt_maybe_skippable(!paths.is_empty())?
     {
-        paths.insert(PathBuf::from(p));
+        let mut p = PathBuf::from(p);
+        if let Ok(real) = p.canonicalize() {
+            p = real;
+        }
+        if p.is_file() {
+            paths.insert(p);
+        } else if p.is_dir() {
+            let mut counter = 0;
+            let mut some_files_already_added = false;
+            let Some(p) = p.to_str() else {
+                eprintln!(
+                    "[error] expected path {:?} to be utf-8 encoded, skipping",
+                    p.display()
+                );
+                continue;
+            };
+            for path in glob::glob(&format!("{p}/*.reword"))?
+                .filter_map(Result::ok)
+                .filter(|p| p.extension().is_some_and(|ext| ext == "reword"))
+            {
+                if paths.contains(&path) {
+                    some_files_already_added = true;
+                    continue;
+                }
+
+                paths.insert(path);
+                counter += 1;
+            }
+            if counter == 0 && !some_files_already_added {
+                eprintln!("[warn] no .reword files in {p:?}");
+            } else {
+                eprintln!("[info] added .reword files: {counter}");
+            }
+        }
     }
 
     let mark_custom_on_export = Confirm::new("Mark exported collection as custom?")
@@ -212,7 +245,7 @@ impl<'ta> InquireTextExt<'ta> for Text<'ta, '_> {
 }
 
 mod validator {
-    use std::error::Error;
+    use std::{error::Error, path::PathBuf};
 
     use inquire::validator::Validation;
 
@@ -227,12 +260,21 @@ mod validator {
     pub fn validate_reword_custom_category(
         value: &str,
     ) -> Result<Validation, Box<dyn Error + Send + Sync>> {
-        if !value.ends_with(".reword") {
-            return Ok(Validation::Invalid(
-                "Custom category file should have .reword extension".into(),
-            ));
+        const VALID: Validation = Validation::Valid;
+
+        let p = PathBuf::from(value);
+        if p.is_dir() {
+            return Ok(VALID);
+        }
+        if p.is_file()
+            && let Some(ext) = p.extension()
+            && ext == "reword"
+        {
+            return Ok(VALID);
         }
 
-        Ok(Validation::Valid)
+        Ok(Validation::Invalid(
+            "Expected directory or file with .reword extension".into(),
+        ))
     }
 }

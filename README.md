@@ -35,6 +35,8 @@ Select "Custom categories" in first question.
 
 To convert custom categories you need to "Share" if from the app, and then select these `.reword` files when asked. Select as many files as you want, then press `Esc` to continue.
 
+Select a directory to add all `.reword` files from this directory. To select current directory, enter `.`
+
 ## Supported apps
 
 Not all applications are currently supported. After launching this application, you will see a list of supported applications.
