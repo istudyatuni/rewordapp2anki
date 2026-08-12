@@ -1,6 +1,6 @@
 pub use func::*;
 
-use crate::info::AppTranslationInfo;
+use crate::info::{AppTranslationInfo, Language};
 
 mod func {
     use rusqlite::Row;
@@ -83,12 +83,21 @@ mod func {
     /// List of languages supported by app for learning
     pub fn app_languages(app: App) -> &'static [Language] {
         match app {
-            App::Deutsch => &deu::LANGUAGES,
             App::English => &eng::LANGUAGES,
-            App::Finnish => &fin::LANGUAGES,
-            App::Japanese => &jap::LANGUAGES,
             App::Russian => &rus::LANGUAGES,
-            _ => todo!("app not yet supported"),
+            App::Chinese
+            | App::Czech
+            | App::Deutsch
+            | App::Dutch
+            | App::Finnish
+            | App::French
+            | App::Italian
+            | App::Japanese
+            | App::Korean
+            | App::Polish
+            | App::Portuguese
+            | App::Spanish
+            | App::Turkish => &BASE_LANGUAGES,
         }
     }
 }
@@ -118,11 +127,7 @@ fn words_common(info: &AppTranslationInfo) -> String {
         .replace("{EXAMPLES}", &format!("w.examples_{db_name}"))
 }
 
-mod deu {
-    use crate::info::Language;
-
-    pub const LANGUAGES: [Language; 2] = [Language::English, Language::Russian];
-}
+pub const BASE_LANGUAGES: [Language; 2] = [Language::English, Language::Russian];
 
 mod eng {
     use crate::info::Language;
@@ -169,8 +174,6 @@ mod jap {
         WORDS.replace("{LANG}", &format!("w.{}", info.tr_lang.db_name()))
     }
 
-    pub const LANGUAGES: [Language; 2] = [Language::English, Language::Russian];
-
     pub fn anki_fields() -> AnkiFieldNames {
         AnkiFieldNames {
             word: "Kanji".to_string(),
@@ -193,10 +196,4 @@ mod rus {
     use crate::info::Language;
 
     pub const LANGUAGES: [Language; 3] = [Language::Deutsch, Language::English, Language::French];
-}
-
-mod fin {
-    use crate::info::Language;
-
-    pub const LANGUAGES: [Language; 2] = [Language::English, Language::Russian];
 }
