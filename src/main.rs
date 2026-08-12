@@ -30,13 +30,26 @@ const APPROX_BOUND: usize = 100;
 const DEFAULT_OUTPUT_FILE: &str = "reword.apkg";
 
 fn main() -> Result<()> {
-    let args = args::Cli::parse();
-    let input = ask::ask(args.no_cache)?;
-    let words = match &input.source_path {
-        SourceFile::DB(path) => import_words(&input.tr, path)?,
-        SourceFile::CustomCategories(paths) => import_custom_categories_words(&input.tr, paths)?,
-    };
-    export_deck(input, words)?;
+    fn _main() -> Result<()> {
+        let args = args::Cli::parse();
+        let input = ask::ask(args.no_cache)?;
+        let words = match &input.source_path {
+            SourceFile::DB(path) => import_words(&input.tr, path)?,
+            SourceFile::CustomCategories(paths) => {
+                import_custom_categories_words(&input.tr, paths)?
+            }
+        };
+        export_deck(input, words)?;
+        Ok(())
+    }
+
+    if let Err(e) = _main() {
+        eprintln!("Error: {e:?}");
+    }
+
+    #[cfg(windows)]
+    pause();
+
     Ok(())
 }
 
@@ -142,4 +155,16 @@ fn export_deck(input: UserInput, words: Vec<db::Word>) -> Result<(), anyhow::Err
     println!("File saved in {}", input.output_path);
 
     Ok(())
+}
+
+// https://users.rust-lang.org/t/rusts-equivalent-of-cs-system-pause/4494/4
+#[cfg(windows)]
+fn pause() {
+    use std::io::prelude::*;
+
+    let mut stdout = std::io::stdout();
+    write!(stdout, "Press Enter to continue...").unwrap();
+    stdout.flush().unwrap();
+
+    let _ = std::io::stdin().read(&mut [0u8]).unwrap();
 }
