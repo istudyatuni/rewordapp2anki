@@ -249,32 +249,26 @@ mod validator {
 
     use inquire::validator::Validation;
 
-    pub fn validate_empty_string(value: &str) -> Result<Validation, Box<dyn Error + Send + Sync>> {
-        if value.is_empty() {
-            return Ok(Validation::Invalid("String is empty".into()));
-        }
+    type ValidationResult = Result<Validation, Box<dyn Error + Send + Sync>>;
 
-        Ok(Validation::Valid)
+    fn validate(f: impl FnOnce() -> Result<(), &'static str>) -> ValidationResult {
+        match f() {
+            Ok(()) => Ok(Validation::Valid),
+            Err(e) => Ok(Validation::Invalid(e.into())),
+        }
     }
 
-    pub fn validate_reword_custom_category(
-        value: &str,
-    ) -> Result<Validation, Box<dyn Error + Send + Sync>> {
-        const VALID: Validation = Validation::Valid;
+    fn validate_simple(ok: bool, msg: &'static str) -> ValidationResult {
+        validate(|| if ok { Ok(()) } else { Err(msg) })
+    }
 
+    pub fn validate_empty_string(value: &str) -> ValidationResult {
+        validate_simple(!value.is_empty(), "String is empty")
+    }
+
+    pub fn validate_reword_custom_category(value: &str) -> ValidationResult {
         let p = PathBuf::from(value);
-        if p.is_dir() {
-            return Ok(VALID);
-        }
-        if p.is_file()
-            && let Some(ext) = p.extension()
-            && ext == "reword"
-        {
-            return Ok(VALID);
-        }
-
-        Ok(Validation::Invalid(
-            "Expected directory or file with .reword extension".into(),
-        ))
+        let ok = p.is_dir() || p.is_file() && p.extension().is_some_and(|ext| ext == "reword");
+        validate_simple(ok, "Expected directory or file with .reword extension")
     }
 }
