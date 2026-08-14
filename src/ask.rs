@@ -62,6 +62,8 @@ pub fn ask(no_cache: bool) -> Result<UserInput> {
         .with_autocomplete(FilePathCompleter::default())
         .with_help_message(&current_dir_help())
         .with_initial_value(DEFAULT_OUTPUT_FILE)
+        .with_validator(validator::validate_empty_string)
+        .with_validator(validator::validate_apkg)
         .prompt()?;
 
     Ok(UserInput {
@@ -81,9 +83,11 @@ fn ask_apk(no_cache: bool) -> Result<ExportSpecificAnswer> {
 
     let db_path = db_cache_path(app)?;
     if !db_path.exists() || no_cache {
-        let apk_path = Text::new("Path to .apk file:")
+        let apk_path = Text::new("Path to .apk/.xapk file:")
             .with_autocomplete(FilePathCompleter::default())
             .with_help_message(&current_dir_help())
+            .with_validator(validator::validate_empty_string)
+            .with_validator(validator::validate_apk_xapk)
             .prompt()?;
         extract_db(app, apk_path, &db_path)?;
     } else {
@@ -215,7 +219,7 @@ enum SourceFileKind {
 impl Display for SourceFileKind {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = match self {
-            SourceFileKind::Apk => "APK file",
+            SourceFileKind::Apk => "APK/XAPK file",
             SourceFileKind::CustomCategories => "Custom categories",
         };
         write!(f, "{s}")
@@ -264,6 +268,20 @@ mod validator {
 
     pub fn validate_empty_string(value: &str) -> ValidationResult {
         validate_simple(!value.is_empty(), "String is empty")
+    }
+
+    pub fn validate_apk_xapk(value: &str) -> ValidationResult {
+        let p = PathBuf::from(value);
+        let ok = p.is_file()
+            && p.extension()
+                .is_some_and(|ext| ext == "apk" || ext == "xapk");
+        validate_simple(ok, "Expected .apk or .xapk file")
+    }
+
+    pub fn validate_apkg(value: &str) -> ValidationResult {
+        let p = PathBuf::from(value);
+        let ok = p.is_file() && p.extension().is_some_and(|ext| ext == "apkg");
+        validate_simple(ok, "Expected .apkg file")
     }
 
     pub fn validate_reword_custom_category(value: &str) -> ValidationResult {

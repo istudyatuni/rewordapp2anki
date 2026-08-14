@@ -2,34 +2,33 @@
 
 Convert word lists from [reword.app](https://reword.app) to Anki decks.
 
-## How
-
-- Download Reword's apk, from which you want to import words (e.g. from [apkpure.com](https://apkpure.com/developer/POAS%20Apps)).
-- Install and run this tool, as described below.
-- If you want to convert custom categories, you don't need an apk file, see [below](#exporting-custom-categories) for usage.
-
-### Note on .XAPK files
-
-XAPK files are just ZIP archives, and required APK file is inside it. Open XAPK file, search inside for APK file with name like `ru.poas.[some name].apk`, extract it, and then select extracted APK when asked.
-
-## Installation and usage
+## Installation
 
 You can download pre-built binaries from [latest release](https://github.com/istudyatuni/rewordapp2anki/releases/latest). Unpack downloaded archive, then:
 
 - Linux: run as `./rewordapp2anki`
 - Windows: run from the file explorer
 
-## Exporting
+## Supported sources
 
-### Exporting built-in categories
+This tool support importing from:
 
-Select "APK file" in first question.
+- `.apk`/`.xapk` files (`.xapk` are downloaded from apkpure.com)
+- custom categories - exported from app itself as `.reword` files
+
+## Export
+
+### Export built-in categories
+
+Download Reword's apk/xapk, from which you want to import words (e.g. from [apkpure.com](https://apkpure.com/developer/POAS%20Apps)).
+
+Select "APK/XAPK file" in first question.
 
 Categories are saved as tags, so you can export all words at once, and then create filtered decks for specific categories.
 
 When specific categories are selected, words that are in those categories are exported, even if those words occur in other categories. Also, category tags that are not selected will not be removed from the exported words.
 
-### Exporting custom categories
+### Export custom categories
 
 Select "Custom categories" in first question.
 
