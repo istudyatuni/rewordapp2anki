@@ -6,7 +6,9 @@ linux-target := "x86_64-unknown-linux-musl"
 @default:
 	just --list
 
-build-all: build-linux build-win
+@build-all: check-xwin build-linux build-win
+	echo Built linux and windows binaries:
+	fd -d 1 '{{ name }}-' target
 
 # build static linux binary
 build-linux: && pack-linux
