@@ -8,7 +8,7 @@ linux-target := "x86_64-unknown-linux-musl"
 
 build-all: build-linux build-win
 
-# build static binary
+# build static linux binary
 build-linux: && pack-linux
 	@# CARGO_HOME and /tmp/.cargo is used to use local cargo download cache
 	docker run --rm -it \
@@ -23,7 +23,8 @@ build-linux: && pack-linux
 			--target={{ linux-target }} \
 			--config build.rustc-wrapper="''"
 
-build-win: && pack-win
+# build static windows binary
+build-win: check-xwin && pack-win
 	RUSTFLAGS="--remap-path-prefix $HOME=/build" \
 	cargo xwin b --release --target={{ win-target }} --features sqlite-bundled
 
@@ -36,3 +37,7 @@ pack-linux:
 pack-win:
 	rm -f "target/{{ name }}-windows.zip"
 	cd "target/{{ win-target }}/release" && zip "../../{{ name }}-windows.zip" "{{ name }}.exe"
+
+[private]
+check-xwin:
+	which cargo-xwin
